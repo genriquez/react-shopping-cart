@@ -22,7 +22,7 @@ class CartProduct extends Component {
 
 
   render(){
-    const { product, removeProduct } = this.props;
+    const { cartItem, removeProduct, product } = this.props;
 
     const classes = ['shelf-item'];
 
@@ -47,11 +47,14 @@ class CartProduct extends Component {
           <p className="title">{product.title}</p>
           <p className="desc">
             {`${product.availableSizes[0]} | ${product.style}`} <br />
-            Quantity: {product.quantity}
+            Quantity: {cartItem.quantity}
           </p>
         </div>
         <div className="shelf-item__price">
-          <p>{`${product.currencyFormat}  ${util.formatPrice(product.price)}`}</p>
+          <p style={{ textDecoration: product.discount ? "line-through" : null, marginBottom: product.discount ? "0" : null }}>{`${product.currencyFormat}  ${util.formatPrice(product.price)}`}</p>
+          {product.discount && 
+          <p style={{ marginTop: 0 }}>{`${product.currencyFormat}  ${util.formatPrice(product.price * 0.9)}`}</p>
+          }
         </div>
 
         <div className="clearfix" />

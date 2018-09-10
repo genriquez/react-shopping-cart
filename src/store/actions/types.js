@@ -1,5 +1,6 @@
 // Product Page
 export const FETCH_PRODUCTS = 'FETCH_PRODUCTS';
+export const DISCOUNT_PRODUCT = 'DISCOUNT_PRODUCT';
 // Float Cart
 export const LOAD_CART = 'LOAD_CART';
 export const ADD_PRODUCT = 'ADD_PRODUCT';

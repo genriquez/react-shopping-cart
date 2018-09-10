@@ -12,7 +12,13 @@ const Product = (props) => {
   // Um componente de input pode alterar a quantidade no futuro
   product.quantity = 1;
 
-  let formattedPrice = util.formatPrice(product.price, product.currencyId);
+  let price = product.price;
+  if (product.discount) {
+    price = price * .9;
+  }
+
+  let formattedOriginalPrice = util.formatPrice(product.price, product.currencyId); 
+  let formattedPrice = util.formatPrice(price, product.currencyId);
   
   let productInstallment;
   
@@ -39,16 +45,33 @@ const Product = (props) => {
       <p className="shelf-item__title">{product.title}</p>
       <div className="shelf-item__price">
         <div className="val"><small>{product.currencyFormat}</small>
-          <b>
-            {formattedPrice.substr(0, formattedPrice.length - 3)}
-          </b>
-          <span>
-            {formattedPrice.substr(formattedPrice.length - 3, 3)}
+          <span style={{ textDecoration: product.discount ? "line-through" : ""}}>
+            <b>
+              {formattedOriginalPrice.substr(0, formattedOriginalPrice.length - 3)}
+            </b>
+            <span>
+              {formattedOriginalPrice.substr(formattedOriginalPrice.length - 3, 3)}
+            </span>
           </span>
+
+          {product.discount &&
+            <span>
+              <b>
+                {formattedPrice.substr(0, formattedPrice.length - 3)}
+              </b>
+              <span>
+                {formattedPrice.substr(formattedPrice.length - 3, 3)}
+              </span>
+            </span>
+          }
         </div>
         {productInstallment}
       </div>
       <div onClick={() => props.addProduct(product)} className="shelf-item__buy-btn">Add to cart</div>
+      
+      <div onClick={() => props.discountProduct(props.index, !product.discount)} className="shelf-item__buy-btn">
+        {product.discount && "Remove discount" || "Discount"}
+      </div>
     </div>
   );
 }
@@ -57,6 +80,7 @@ const Product = (props) => {
 Product.propTypes = {
   product: PropTypes.object.isRequired,
   addProduct: PropTypes.func.isRequired,
+  discountProduct: PropTypes.func.isRequired
 };
 
 export default Product;

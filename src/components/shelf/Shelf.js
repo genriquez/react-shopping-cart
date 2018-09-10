@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
-import { fetchProducts } from '../../store/actions/productActions';
+import { fetchProducts, discountProduct } from '../../store/actions/productActions';
 import { addProduct } from '../../store/actions/floatCartActions';
 
 import Product from './Product';
@@ -50,6 +50,8 @@ class Shelf extends Component {
         <Product
           product={p}
           addProduct={this.props.addProduct}
+          discountProduct={this.props.discountProduct}
+          index={products.indexOf(p)}
           key={p.id}
         />
       );
@@ -87,4 +89,4 @@ const mapStateToProps = state => ({
   sort: state.sort.item,
 })
 
-export default connect(mapStateToProps, { fetchProducts, addProduct })(Shelf);
+export default connect(mapStateToProps, { fetchProducts, addProduct, discountProduct })(Shelf);

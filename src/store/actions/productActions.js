@@ -1,4 +1,4 @@
-import { FETCH_PRODUCTS } from './types';
+import { FETCH_PRODUCTS, DISCOUNT_PRODUCT } from './types';
 import axios from 'axios';
 
 
@@ -50,4 +50,14 @@ export const fetchProducts = (filters, sortBy, callback) => dispatch => {
       console.log(err);
       throw new Error('Could not fetch products. Try again later.');
     });
+}
+
+export const discountProduct = (productIndex, discount) => dispatch => {
+  dispatch({
+    type: DISCOUNT_PRODUCT,
+    payload: {
+      index: productIndex,
+      discount: discount
+    }
+  })
 }

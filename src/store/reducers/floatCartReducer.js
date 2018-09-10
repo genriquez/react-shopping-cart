@@ -15,7 +15,7 @@ export default function(state = initialState, action) {
     case ADD_PRODUCT:
       return {
         ...state,
-        item: Object.assign({}, action.payload)
+        item: { productId: action.payload.id, quantity: 1 }
       };
     case REMOVE_PRODUCT:
       return {

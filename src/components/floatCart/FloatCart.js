@@ -15,7 +15,7 @@ import util from '../../util';
 class FloatCart extends Component {
   
   state = {
-    isOpen: false,
+    isOpen: false
   };
 
   componentWillMount() {
@@ -46,19 +46,26 @@ class FloatCart extends Component {
     this.setState({ isOpen: false });
   }
 
+  mapItem = (item) => {
+    const { products } = this.props;
+
+    var product = products.find(p => p.id == item.productId);
+    return { product, cartItem: item };
+  }
+
   addProduct = (product) => {
     const { cartProducts, updateCart } = this.props;
     let productAlreadyInCart = false;
 
     cartProducts.forEach(cp => {
-      if (cp.id === product.id) {
+      if (cp.productId === product.productId) {
         cp.quantity += product.quantity;
         productAlreadyInCart = true;
       }
     });
 
     if (!productAlreadyInCart) {
-      cartProducts.push(product);
+      cartProducts.push({ productId: product.productId, quantity: 1 });
     }
 
     updateCart(cartProducts);
@@ -66,9 +73,9 @@ class FloatCart extends Component {
   }
 
   removeProduct = (product) => {
-    const { cartProducts, updateCart } = this.props;
+    const { cartProducts, updateCart, products } = this.props;
 
-    const index = cartProducts.findIndex(p => p.id === product.id);
+    const index = cartProducts.findIndex(p => p.productId === product.id);
     if (index >= 0) {
       cartProducts.splice(index, 1);
       updateCart(cartProducts);
@@ -85,18 +92,51 @@ class FloatCart extends Component {
     }
   }
 
-  render() {
-    const { cartTotals, cartProducts, removeProduct } = this.props;
+  calculateTotals() {
+    let { cartProducts, products } = this.props;
+    cartProducts = products.length > 0 ? cartProducts.map(this.mapItem) : [];
 
-    const products = cartProducts.map(p => {
+    let productQuantity = cartProducts.reduce( (sum, p) => {
+      sum += p.cartItem.quantity;
+      return sum;
+    }, 0);
+  
+    let totalPrice =  cartProducts.reduce((sum, p) => {
+      sum += p.product.price * p.cartItem.quantity * (p.product.discount ? .9 : 1);
+      return sum;
+    }, 0);
+  
+    let installments =  cartProducts.reduce((greater, p) => {
+      greater = p.product.installments > greater ? p.product.installments : greater;
+      return greater;
+    }, 0);
+    
+    return {
+      productQuantity,
+      installments,
+      totalPrice,
+      currencyId: 'USD',
+      currencyFormat: '$',
+    }
+  }
+
+  render() {
+    const { cartProducts, removeProduct, products } = this.props;
+
+    const cartItems = products.length > 0 ? cartProducts.map(ci => {
+      var product = products.find(p => p.id == ci.productId);
+
       return (
         <CartProduct
-          product={p}
+          cartItem={ci}
           removeProduct={removeProduct}
-          key={p.id}
+          product={product}
+          key={product.id}
         />
       );
-    });
+    }) : [];
+
+    let cartTotals = this.calculateTotals();
 
     let classes = ['float-cart'];
 
@@ -137,8 +177,8 @@ class FloatCart extends Component {
           </div>
 
           <div className="float-cart__shelf-container">
-            {products}
-            {!products.length && (
+            {cartItems}
+            {!cartItems.length && (
               <p className="shelf-empty">
                 Add some product in the bag <br />:)
               </p>
@@ -182,7 +222,7 @@ const mapStateToProps = state => ({
   cartProducts: state.cartProducts.items,
   newProduct: state.cartProducts.item,
   productToRemove: state.cartProducts.itemToRemove,
-  cartTotals: state.cartTotals.item,
+  products: state.products.items,
 });
 
 export default connect(mapStateToProps, { loadCart, updateCart, removeProduct})(FloatCart);
